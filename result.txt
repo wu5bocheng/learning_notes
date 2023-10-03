@@ -1,0 +1,453 @@
+Good afternoon, everyone welcome welcome welcome, we have two catastrophic events that have befallen this class Unfortunately I left my coffee in my office.
+So if I start dragging or sound horse, then I might run up and grab my coffee and abandon you all and that's catastrophe number one the major one, the minor one is that.
+zach has coven so lecture on on Thursday may or may not be in person.
+I think everyone should just come here and if he's feeling good we'll put them up on the screen and if he's not feeling good, then I will submit at the last minute and be really confused because I wasn't prepared for lecture very well.
+If you had appointments or meeting scheduled with him congratulations, you get to reschedule them with me because he's gonna be out for 10 days hanging out not giving other people.
+yeah.
+Sometimes I thank you all for sharing your masks so that the rest you actually have an in person instructor for the coming 10 days.
+So today we're going to shift gears a little bit and talk about issues that are relevant to you as you face down cash lab and then in particular Malik lab.
+So one thing you may have noticed about cash lab is that for many of you, depending on what your programming background wasn't what other classes you've had.
+This was one of the first times that you've had the blank page problem because we said hey go write a cash simulator and we didn't give you any skeleton files we didn't give you any frameworks, we just said, look create a file called something dot C and make it work.
+So in 213 and then getting worse, as you get into the 400 series classes, you have the blank page problem, how do I get started with my design.
+And you have increasingly more hideous amounts of debugging so the point of this lecture is to seed you with some ideas.
+For when you're in the situation and you feel like throwing your computer out the window, how to productively debug and not end up with a multi thousand dollar computer out the window.
+So, at the end of this lecture you will hopefully be able to describe some steps that you can use to debug complex code failures.
+The stuff we're going to talk about mostly applies to when you are ready to scream right if you get a compiler error that says warning print Naf not found, you are going to fix that in 10 seconds and it's not going to be a complex debugging problem.
+identify when your code just randomly same faults every third time you run it sometimes on Tuesdays.
+that's the kind of situation we're going to be talking about today and state guidelines identify ways to manage complexity.
+When when programming, including thinking about your design in an iterative kind of way and stay some guidelines for comments and how you communicate the intent of your code.
+A lot of the stuff especially comments borders on religion and so we're going to give you one view of it that many people feel is pretty reasonable, there are other views in the world and that's Okay, there are many religions there's Java.
+nevermind okay.
+So let's start everybody who teaches anything about debugging and cell phones loves to start with non directly computer related examples of failures in the real world.
+And so famous rocket the Atlas Center rocket but, since our second stage failed because it went into this completely uncontrolled spin.
+After a lot of investigation, and this was actually a huge problem, because this was early on in when when NASA was trying to set the seeds for commercial space launches.
+And this was one of the first rockets that was not actually inspected I like and and got went through the full government NASA heavy weights like we will prevent crashes at all costs kind of process, so of course the crash crash they to blow it up.
+So they figured out is that when they were cleaning the pumps they they rub them with those little blue scouring pads like you have in your kitchen.
+I mean they these are probably the ones the cost of $1,000, but they were basically like the ones you use in your kitchen.
+And they left these teensy weensy little pieces of plastic that built up, and they were just enough to block and the turbo pump.
+So boom so, then they said okay next solution let's bake off the plastic so after they scoured the heated up they vaporize on the plastic and they thought life was awesome but the next time it crashed to.
+And it turns out there wasn't leaking valve there was letting some air in there, that when it expanded was causing a little bubble that block the turbo bump and they had the same symptoms of failed turbo pump from a different cars, all in the same like sequence of launches.
+And they only hit this one, because they decided that, in order to get increased efficiency, they needed to chill the pump the turbo pumps more and blah blah blah blah blah.
+It had been a problem that had been hanging around forever, we would call that a latent fault, there was a latent fault in the system that had been hanging around and was only triggered under certain conditions, this is the kind of debugging that will drive you nuts, but it's really fun.
+For computing a programmer or whatever hardware system creates a defect or a fault.
+and write, something that is going to go wrong.
+That defect may or may not on any specific run of your program cause an error and error i'm going to refer to an incorrect set of bits in memory your data gets corrupted or the control signals coming out of your Program.
+Are are in an erroneous state.
+An error on its own may not directly cause a failure right in some systems we have things like error correcting codes or ECC memory that can actually correct errors oh my God, thank you, you have saved my life path is the best person in the world.
+Okay catastrophe number one averted pat if you can fix this X coven you are a w here.
+Really really are here.
+We could call it pat livid and call it a new drug from Pfizer.
+i'm sorry if that was really dumb so anyway, so you might have ways of masking errors of hiding errors of detecting errors, so that they don't cause of failure, but if you don't catch her mastered whatever the failure.
+And the air, eventually, it will probably come and turn into a failure and failure we define as when the system does something that is not what the spec says it's supposed to do.
+Right it's a totally generic definition, but because that's what software is right, we have an idea of what the software is supposed to do, and if it doesn't do what we think it is that's that's a failure.
+As I said, not every defect always causes of failure, it could be latent or it could be active and it is very common in real code.
+For there to be lots of defects hiding in code that doesn't get executed, very often, so, for example.
+In error handling code there's often defects, because you don't test your error handling code is often like What do you do, and as you all know from lab zero.
+If Malik returns know right most people when they write code handle very poorly The case of the memory alligator saying hey there's no there's no memory available because you're like what if there's no memory, I can just kind of like crash and blah blah blah.
+And as dykstra noted, he was a jerk but he was smart testing can only show the presence of bugs not their absence so testing gets you a certain amount of the way there, but just because all your tests past doesn't mean you don't have any defects.
+Okay, this is what we talked about some executions will not trigger the defect.
+When you start approaching your debugging and because you're you're Malik lab is just like crashing or reusing memory that you didn't think was supposed to be reused.
+One of the first tricks that's really helpful, we often call the rubber duck problem grab a duck and explain your problem, allowed don't think it explained it allowed.
+Why, and this is, I swear this is helpful, why is this helpful.
+describing the problem allowed my make you notice something new about it oftentimes when we write code, we look at it and we see what we thought we wrote.
+Or you know it's like when you write you write a paper and there's a big obvious spelling error, right in the middle of it and you've looked at this thing 100 times and you never noticed it and you hand it to your roommate and they're like dude you misspelled the word Hello.
+Oh right different eyes different approaches verbalizing instead of just reading and thinking and sometimes you'll say something and you're like oh.
+I do that, so this is helpful right it takes you 10 seconds so talk to the duck talk to a stuffed animal teddy bear.
+But if it doesn't work, then you can get into a more scientific approach to the debugging.
+So what we often think about is coming up with a hypothesis for what's going wrong with your code and then identifying a way of testing whether or not your hypothesis is right.
+Now, of course, this presupposes that you know enough about what's going on to have a reasonable hypothesis right if all you see is segmentation fault.
+Right you kind of got two choices one you just wrote a new line of code.
+And you're like oh yeah I bet I messed that up right, because if there's one line of new code and you change one thing and you're like oh yeah.
+I know the idiot who wrote that the other possibilities you're like oh boy sake fault, I have no idea why.
+So before you can form a hypothesis, you might have to go and collect more information, you might run with debugging enabled.
+You might have built in some print Apps that you can just enable you might run hundred GB you might run undervalued and you might do all these other things, but you get some information.
+That helps you have a feel for what's going on, so that you can come up with a reasonable hypothesis when in doubt occam's razor says pick the simplest one.
+Often encode That means that the newest code you wrote is probably where the bug is.
+But then make a prediction, if you are right, if it is correct that you forgot to check.
+That you're saying for this happening because you didn't check whether Malik succeeded or not, then you know you could go and you could you could tweak it a little you could add a check you could assume that something will have you'll see it in GB.
+Get the day identify what you can do to get it to get data to verify or or.
+refute that hypothesis, and then go ahead and refine it if you need to.
+So we'll call that a diagnosis when you've correctly identified the problem right you'll have some hypotheses and you'll go from that to a diagnosis.
+Once you've diagnose the problem, of course, you have to come up with fix usually in this class that will be pretty straightforward, but not always.
+And then you will confirm that your fix actually worked.
+This is code with above you don't have to look at the code in great detail, yet.
+But you should look at the output it's asking for the fibonacci sequence, we asked for 9876 blah blah blah blah blah, but when we asked for the first element in the fibonacci sequence.
+They gave us a big blank of number, there is a bug in this code, by definition, because this does not meet the specification of the fibonacci sequence, so this is a failure triggered by a defect above.
+How do we know it's a failure, because we have an idea of the spec of fibonacci now we can argue about which Speck of fibonacci this code should actually be trying to do right.
+Just fibonacci start 112 or one two i'm you know, whatever you should have an idea of that, because if you don't know the spec your programming to what are you doing.
+But now we have to debug this problem so you're faced with this senate outputs and well, many of you have probably already looked at the code and identified the bug because we've simplified something to present in class pretend you haven't.
+So we've observed some working runs right, what do you know about what's going on well you know we got 59 right and you got 58 right you got everything except for one wrong that's really strange.
+So, as you read through the code.
+You can say well let's see maybe it depends on the order in which we called maybe 51 failed because it was the last time we called it.
+Or maybe.
+we're not handling this case of n equals one right we have in greater than one maybe that's the bug or maybe the bug is that the F that we're returning we never initialized Now we all know, that is, the bug.
+But again pretend.
+before you start really, really racking your head against it, it is really useful to use the tools that help you do this stuff automatically.
+compile with dash w all right, this is mornings w capital w for GCC is warnings, all this will have the compiler yell at you for anything it can identify.
+compilers over the decades have gotten smarter see is still a hard a hard language for the compiler to help you with everything, because there are just there are pitfalls.
+But he will tell you, for example, if you compile this code, while in WW error, by the way, says exit on warnings treat a warning as an error.
+So that's a way to to just block compilation of your code entirely when you said, make you'll get an error if the compiler wants to yell at you for anything sometimes it's a little pedantic but that's Okay, because you're debugging.
+If you were to do that on this code, the compiler itself would actually warn you that F may be used on initialized in this function.
+Thank you compiler you're doing that work for us.
+You can also try with other optimization levels if your code works properly under death oh zero and not under dash oh three, or vice versa it's extremely likely that you are either doing something with under initialized memory or undefined behavior.
+Someone know what undefined behavior is.
+Close it's something where the compiler the spec doesn't actually say what the compiler has to do, and therefore the compiler is allowed to do anything.
+anything at all if the compiler knows that you are using and initialized memory, the compiler could choose a value to attach to that memory that made its job easier, it might optimize a way large portions of your code, for example.
+Its behavior will differ under optimizations avoiding undefined behavior or you be you might see it is really important for having your code work well and I apologize it's actually impossible to avoid all you B and C and, but we can avoid most of it.
+computers are terrible.
+So, if your code behaves differently under different optimization levels that helps you form a hypothesis, you should be like Oh, did I not initialize memory, did I did I you know, do something that's out of the spec of what the C compiler is allowed to do.
+And indeed, if you take that code with that and initialized F and you run it under different optimization levels, you will actually see different outputs because the compiler will try to will poke around at different values of F.
+In order to optimize it's actually the interaction of undefined behavior and optimization the compiler will be like oh look.
+That could be six and then this code never executes I can wipe out that code and if that could never execute this thing never goes, and so the code entire set of code changes.
+Also tribe algorithms I hate that it's pronounced that way but it's named after one of the one of the norse gods so Val.
+Val grind is a it executes your program basically in in an emulated environment, it can track things like access to and initialized memory.
+You will love this during Malik lab right you're like dog runs like hey hey you double fried that thing you're like oh I didn't think I meant to double for you that.
+Now here's an interesting one, if you run under bad fib under of algorithms.
+Zero errors from zero contexts Val grind in this particular invocation didn't find any bugs.
+And the reason it didn't find any bugs in this particular case is that, after the compiler had already compiled with oh three, the and initialized variable had disappeared so value and didn't know what to do with it.
+Whereas if you can with zero the and initialize variable is still there and value and then said hey we're doing all this stuff and, if you read through the.
+Things use of initialized value of size, a depends on initialized value, so these tools are there to help you to make your life better when you are are debugging gnarly stuff.
+Okay, so we've come up with our hypothesis that F was on initialized.
+If your hypothesis is correct, you should be able to initialize F and get a better or correct results.
+So.
+The other prophecies obviously didn't work if we call fib one First, it will fail, it will return nope it was not an ordering problem if we change the end greater than one is still doesn't work for zero because there's still that and initialized variable.
+favorite one is definitely not to but changing to F equals one worked, and not only that it actually was the fix to this code so in debugging you came up with the fix.
+This second line is a little odd.
+don't interfere.
+depends, depending on the kind of bug you're having this can be.
+Maybe you can ignore it, or maybe you should really, really pay attention to it.
+And we often think of some kinds of errors like logic errors, if you are programming a robot to pick up an eraser and it just like it always goes five feet past the eraser but the program is not crashing.
+Right, you probably have a logic bug you've like you messed up your your geometry or something else you can perturb the heck out of your code put princess anywhere you want.
+But if your program is safe Baltic we're having what are often called highs and bugs bugs that are hard to they don't always appear they disappear when you look at them.
+Then don't interfere.
+Why can adding a print F to your code change the execution of your code.
+I don't know what you have your hand up.
+It changes the size it changes the instructions, it might change the state of the stack.
+If you left a variable on the stack that was not getting initialized some other function that was writing using the stack might leave that stack in a different States.
+Right it preserves your code so weird and bizarre oh crashes don't add prints until you've at least gotten further down the road.
+Do not ever proceed past the first bug if you think your code has five bugs fixed one of them, try to verify it right don't just ignore the other bug.
+and be like well you know what it crashes every 10th run but who cares i'll come back and i'll fix that tomorrow.
+Right, because a recency matters you like a microprocessor have a cash and the code that's been in your head you're going to remember and deal with more efficiently.
+And you are not a microprocessor but you definitely have a cash and secondly debugging two bugs that are interacting and making a total mess is way harder than debugging one, at a time, so when you've spotted a bug.
+Do future you a favor right a lot of this class is actually about doing future you a favor.
+debug that bug now so that you at the deadline isn't like oh yeah I forgot about the bug.
+That was the didn't disappeared, while I had this other codec okay so we've got dividers and that let you see the state of variables they're extremely useful we've got vallegrande.
+We do have debugging print tests and other things like that we have tests, all of these things can be very helpful as you debug.
+Once you've identified your the actual true cause of the bug right you've got a good diagnosis, then you go ahead and you develop a fixed.
+Right, be a little careful correlation does not imply causation It is possible that you change something that was not actually related to the bug.
+So come up with a test to verify it if you think you fixed the case for n equals one you know poke it try n equals two n equals three with and without the with them without the fix.
+and understand why your defect in your fix related.
+confirm it.
+and
+learn from it, and this is again this is doing future you a favor, how do we learn from our defects well, one thing is that we're just like oh yeah.
+gosh I forgot to check if Malik returns none or no okay i'm going to try to remember that in the future okay that's all well and good, but you're human you're going to.
+mess up and.
+So there's a little bit of personal like development improvement that happens because we're all constantly learning about this, but it's also really useful to add this to the code, so the bug can happen again.
+So you can do that I things like adding assertions and in your code now remember anything contained in an assert under certain compilation flags can get nuked.
+Right, the compiler few say dash D and debug it'll go away so don't have side effects in your service, but you can check for things assert.
+Food not equals to know and then, if you ever have that bug creep up again for any other reason, when you execute through you'll get assertion failed and was no and you're like oh yeah I finally fixed that bug.
+In some places, you can add invariance things like that so add checks to detect the failure, yes.
+Any code that is executed can interfere, but a very simple comparison of two things, probably won't interfere in the same way that a complex and thing print F is a.
+If you ever want a headache look at the source code for print if it's meant it's like massive and crazy and huge and and.
+Has like language localization things and like handles everything under the sun it's it's an absolutely ginormous block of code so print half can really mess things up and assertion probably doesn't.
+And then you add tests.
+In this class, we often provide you with really good test suites but not, you know, sometimes there might be value to adding to the test suite something that detects the bug.
+In industry, you almost always do this if you fix a bug you add a test case that catches that bug in case there is a reversion that brings that bug back into play.
+Okay.
+That sounded like a heavy duty process and it was right, I have a hypothesis it's like the you know the mythological view of science it's a little over simplified.
+it's the mythological view of debugging that's a little over simplified and people don't start by immediately doing all of this.
+They start by taking a look at it, they use the simple stuff use the tools use dash w all of algorithms.
+You know your own brain thinking about it, explaining it to some you know talk to the talk to the teddy bear and but.
+If that goes on for too long, right after about 10 minutes of squinting and thinking and poking a little here and there.
+It often behooves you to then start being a little more formal about how you how you track the bug.
+write it down right you're like okay crashes when n equals five crashes every three times like write down the results of your experiments and your observations, so that you can think about them in a comprehensive way.
+In this class after about an hour of that.
+Take a break come to office hours we're here we've seen a lot of bugs are our bug the pattern matches are very well primed, so we are delighted to help you.
+The first hour of your debugging experience will be educational and you will be learning and spending time debugging is one of the learning processes of this class and it's important to do it.
+screaming and flailing and wanting to throw your computer out the window is not part of the educational process it's just frustration and we don't want frustration with no game so after now we're coming to get help or take a break.
+When we look at your code when an experienced programmers looks at your code and starts to help debug and one of the things they're going to do is they're going to look for smells.
+they're gonna search for smells.
+they're going to look for things like are you using an initialized variables, do you have unused values, do you have unreachable code.
+Do you leak memory right do you always Alec and free and do you use languages that make it easier to not have to track our country moves.
+And do you have no pointers right all of these things represent potential latent defects in your code, they may not be the source of the problem you are seeing.
+But if you've ever asked for help on pizza, for example, and you've pasted a bunch of code, you may notice that I or my staff comes back to you and says, you know i'm not quite sure yet, but.
+You should really make sure that you're checking the results of X and sometimes that helps and sometimes it doesn't.
+And the reason we're doing that is we're trying to eliminate possible causes of the bug by getting rid of these these code smells basically.
+So preemptively getting rid of the code smells helps you reduce the scope of problems that you're going to encounter so you don't have as many bugs interacting at the same time.
+Okay, what question and the quiz question first.
+Are you miss using an API.
+um.
+Let me think of a good example for that and we'll take what has not come back to you.
+People sound kind of done.
+A minute or two people done.
+Okay let's assume folks are done.
+So the question was what's a good example of interface misuse.
+Just extemporaneously coming up with one.
+Do you remember in lab zero when you had to either Malik and meme copy or stir copy or stir n copy or things like that.
+So and they're like demons dragons hidden within stir and copy and stir copy, for instance store copy if you haven't checked explicitly check the length of the thing you're copying, you may overwrite.
+memory that you didn't allocate stir n copy behaves really weirdly with Zeroing out the remainder of your string, so there are those are examples of interfaces that are easy to easy to miss us because they have these weird gotchas.
+Okay.
+Yes.
+I like the restricted.
+By restricts many, many functions have many light C library functions will have a restrict requirements for those who don't know restrict says.
+I the programmer promise that if i'm passing in two pointers to a function and they're both marked restrict they are not aliasing each other.
+And they're not going to point to the same memory, so if the compiler knows that two pointers are guaranteed to point to different regions of memory.
+It can come up with some additional optimizations in some cases, and if it has to have things that, then it has to handle the case that they possibly point overlapping memory.
+yeah that's it that's a horrible like that is a good source of bugs meme copy is.
+It meme copy is restricts but be copy or be zero yeah there's been copied my there, there are a couple of different functions, one of which can handle overlapping and one of which camp.
+it's enough to drive me NUTS Okay, and so the first part of this lecture was about debugging when you're faced with hard to debug situations, you may encounter them in cash I hope not, but you may well.
+You will encounter them in Malik lab because you're dealing with a lot of like thinking about the placement of data and structures and things like that.
+and
+The flip side to debugging is how to not be in those horrible debugging situations in the first place, as you write increasingly complicated code over the course of your school and your careers.
+And that starts with design right so as you sit down to design, something you are juggling all of these deliveries, not all of them actually end and it.
+But I think of them as ladies right you want availability, you want your code to be up all the time working, you want security when test stability, you want usability you want high performance ability.
+You want modify ability, you want to be able to change your code and easy ways to adapt to future requirements, you want portability, you would like your code to run whoops your laptop and your phone and and including while it's flying through the air.
+You would like it to be low cost to build to operate efficient right you want all these things, but you know you have to kind of decide.
+So, as you try to achieve those.
+And one thing to keep in mind is that there are there are really two consumers of your code.
+One of those consumers is in the end product, in which your code is incorporated, you know, a slower algorithm if you were in the previous class and implementing Max flow.
+A slower algorithm may make your product less desirable little more expensive something else right, but the other consumers of your code are you and people like you.
+Who will be having to deal with this code in the future and it's really important not to forget that other customer of your code, especially when it's you a week later.
+So good design accomplishes some of those goals, but it also and it, you know as a as a software engineer, you know which of those goals are you hopefully know which of those goals are, how are.
+The weights attached to those goals, how important is high performance How important is reliability right if you are writing code for NASA for a crude shuttle.
+Reliability and debug ability are going to take big big big weights and performance slowly just has to be fast enough to meet the spec.
+But good design also helps you manage the complexity of your Code and the design itself is a form of communication to other people.
+well structured well laid out well thought out well design systems are actually fun to read, or at least less painful to read depending on your perspective spaghetti code does not make its design and its intent clear, it is yucky to read it makes people sad and it's very hard to maintain.
+And unfortunately that is about humans right we know from all sorts of research that.
+We do have caches I wasn't kidding right if we ask a Sam big sampling of people to remember numbers, it turns out, they have a working set size of about seven seven objects those could be numbers those can be letters those could be higher level concepts.
+Right I can't I can't get you to remember more than about seven year old really smart, so I can probably get you to remember eight numbers, if I just throw eight random numbers right smart people get eight.
+normal people get seven like it's not a very big difference and, but I could also probably have you remember.
+You know fan chair squiggle now you've got that in your working set venture squiggle even though, if I had you remember the individual letters of those words you couldn't because you clump them together into concepts.
+and good designs clump things together into concepts that are clear to the reader that they can then reason about at a higher level of abstraction.
+So we often think of phrases like separation of concerns, you will see these phrases we're not going to go into into detail, but if you see these things in books in blogs, and wherever separation of concerns modularity.
+Read usability right i'd like to reuse my concepts extend stability dry an acronym for anyone know.
+don't repeat yourself and it's an idea for structuring code where you're like look if i've written the exact same same 10 lines of code five times again.
+Maybe I should take those 10 lines of code and make them a little function right abstraction information hiding let people use an interface, without having to know all the details inside of it.
+People travel over the decades of come up with all sorts of kind of principles to try to help people construct good code.
+What is clear from a 2022 perspective is that you certainly want to design your code for test stability.
+And there's a really interesting dance between tests and code, in fact.
+Was it about a decade ago, I think it was about a decade ago but i'm probably off by an order of five years.
+And there was this philosophy that came about called test driven development, how many of you have heard of tdd or test driven development.
+Okay, some people, so the idea of tdd is some people said, you know what testing is so important to code that you should actually write your tests first.
+And then write your code, so that it keeps getting more and more of your tests right now that borders on religion, again, is that the one true way to write code know there are many true ways to write code, but it gets it's something really important.
+When you write down a test, you are writing down part of your spec and you are making sure you understand your problem, and that is really fundamental.
+When someone looks at your tests, they can see the things that you had in mind that you were trying to implement.
+right if I say F of one equals one F of two equals four F of three equals nine F of four equals 16 FF five equals 25 you look at my tests and you know immediately that i'm probably implementing.
+Now.
+Good guests.
+No one was paying attention to the numbers excellent.
+squared brave just from looking at a CS little sequence of tests they're like oh he's doing X squared okay good I know what's going on with the code, you understand the test, you may understand the code.
+tests can communicate a lot about what the code is supposed to be doing.
+writing for small testable units can make your life really easy right if you have a little function and you write some tests for it.
+And you have high confidence this function is implemented correctly later on when you're debugging you're like well the bug probably isn't in X squared because I know at least that's reliable right you get to you get to abstracted away and not worry about it as much.
+and building out of solid reliable components is way way easier than building out of like shaky little toothpicks where you're not sure if any of the toothpicks actually work.
+So an example of that is let's say you're talking about oh I don't know randomly let's say looking at a cash access in a simulator.
+What happens when we have a cash access in a simulator that's given an address.
+describe this to me what happens.
+How do you process this in Europe code with you know.
+But too much detail.
+You need to divide the address up and just some different parts What are those different parts.
+The tag.
+In whatever is the block offset or the the offset within the cache line and the.
+The set.
+Right, so you know given an address you have to identify the block offset and the set and the tag right for any cash access.
+Then you have to.
+Look, in that set and.
+For every element in that set, what do I have to do.
+check to see if the tag matches the tag that's stored in the set.
+Right and so on and so forth, and so on.
+Now here's a really interesting thing about this right if we if it doesn't match anything we have to evict if it's fall or store, the new item blah blah blah blah blah oh and, by the way, if it is a if this is a rights, we have to update the dirty bit in the cash.
+Good.
+Which part of this sequence of steps is different, based upon whether i'm doing a store or a load.
+Which parts of this algorithm different between store and load.
+So.
+Does eviction differ from store and load in the cash simulator you all are building right now.
+i'm seeing some knows eviction does not different eviction is the same.
+Because we're going to pull it into cash and then, if it's a right we're going to modify it and market dirty.
+So eviction doesn't differ.
+So what definitely get.
+The dirty bit, the only part of this entire process that changes between a store and a load is at the very end, once we know exactly which item in the cash we're pointing to to update the dirty bit.
+That vaguely kinda sorta suggests that if you have huge identical blocks of code.
+Re implementing all of this logic in store and for load that you've missed some really good opportunities to apply good design principles.
+Because you can probably construct your code in such a way that all of this stuff can happen in one function.
+And then the load gets an extra little chance to go oh yeah and, by the way, poke or you pass in a dirty bit parameter, and it goes poke right.
+And each of these things can be tested independently, you can check your address conversion you could write some little tests for that.
+Make sure when I give you an address you properly identify the number of or the the bits associated with the set the block offset the tag.
+You could check the comparison of the tap right all of these components are independently testable and developable and there is some value.
+In at least thinking about how to modular eyes this so that you can develop it piece by piece by piece and have some confidence that you're doing the right thing.
+Instead of vomiting a massive chunk of code and then at the very end, going test right because it'll fail right test code always fails.
+So testing contracts are complimentary identifying clearly what the interface rules are for your code.
+And, but in some ways, and this is where I said this is religion, these are both acts of design and verification, because if you're going to test your code.
+At a finer finer granularity then a full end to end test right we give you for your cash simulator we give you full end to end tests, they test the complete functionality of your cash simulator.
+They don't test whether or not you correctly person address into tag set and offset they don't test whether or not you are, you know updating the dirty bit correctly in a particular case.
+structuring your code to be able to test those little individual parts is actually designed right you're like okay i'm going to have a little chunk of functionality, that I can tell, they can write some tests for.
+And that's that's informed how you've broken your Code into functions, because you will probably test at the granularity of functions so testing and design, in some ways are inseparable.
+And test, as I said, are basically executable documentation which is kind of cool.
+You can also write your own traces and you might find this extremely valuable as you're going through the process, because you can use the traces as little lightweight tests, if you don't support store yet that's Okay, you could write a to load test load 50 load 50.
+Do you correctly identify that in your direct mapped implementation that needs to be.
+A hit grades you win right, you can develop little teensy weensy tests as you're going along to make the process of building this thing easier, so that you're incrementally increasing the complexity of your tests so don't be shy about writing your own cash traces to exercise your simulator.
+You could test dirty Bytes in cash explicitly very, very simple test, I just want to test my dirty bites.
+Right store a store in element, do I actually have a dirty like then run it in your debugger run it with a print F.
+When we have in the handout some suggested formats for how to log your output so it's comparable to our output and you should be able to see whether or not you marked it dirty depending on if you log that way, so you can write these little tests as you're going along.
+So testable design is also modular design because you've broken your Code into little independent chunks that can be tested, those are also little independent chunks that can be reused.
+And so that automatically gives you some of these kind of Nice properties that we like to think about in good smelling code it's reusable.
+I can, reuse, the thing that breaks my addresses apart into tags or things like that it's eXtensible because I can pick in peace right a much of programming is like.
+Selecting components and using them together it's readable, I know what a function called address to tag does and it's testable.
+It also helps you get separation of concerns.
+Having functions that do either too much or too little and I realized that's that's like totally vague.
+is no good right if you have a function called get first bit of address.
+Get second bit of address your functions are probably doing too little.
+And so, but a function that if one function does everything in your entire cash simulator or your entire Malik right I don't get to look at it, I have to read and absorb the entire function in order to know what's going on.
+So a good breakdown lets me read your big complicated function as a sequence of well named individual little functions i'm like okay get the tags check tag match.
+If not tad match, then it, you know evict blah blah blah blah blah, if I can read it like that I can read your design like English.
+And finally, their concepts that probably don't come up as much in the cash lab and except for the the representation of the cash itself about encapsulation and abstraction.
+And this will come up more in Malik lab and the idea is that you don't go poking your nose into other people's business.
+And you have a set of well defined functions that can manipulate your cash structure, but the clients of those functions right your main function.
+Should not know that cash line bracket five dot dirty bit right your main function should just be like cash equals cash allocate fu.
+And then do simulation run on cash or something like that right your main function should only know that there's this opaque cash object if indeed it knows about the cash object at all.
+And so, you should have people code keep it to minding its own business, the encoding manipulates the cash gets to manipulate the caching gets to poke inside its internal data structures, but all of the clients they don't poke directly inside of a complex data structure.
+and trust the compiler.
+Sometimes you will hear it said that premature optimization is the root of all evil if you spend too much time on the Internet.
+What this what this is getting at is that the compiler is awfully good at little micro optimizations if you say in your compiler.
+comment you know cache size equals 8192 times eight times six and you have a little comment at the end explaining you know 8k entries.
+Six Bytes each whatever whatever that math disappears, the compiler just automatically does that it's called constant folding it calculates all this constants for you and just makes them disappear.
+If you have some unnecessary temporary variables you're like Var, you know as a boule is in cash equals, something is in cash Bola the compiler makes them all go away.
+So you usually do not need to worry about that, and you should far far far bias yourself in favor of readable well structured code.
+There may come a time in your life and, if you take that juicy hedge fund hf T position.
+When you will care about every cycle and every line of code you write and then you have my explicit permission to write the ugliest code you've ever seen in your life, but until then bias towards really, really readable nice code.
+Better better jobs than working for hf tease but it's Okay, if you do and let the compiler do the math us plenty of functions right there may be some overhead but we don't care.
+Because remember you are communicating with the machine with the other developers with people who are reviewing your code in many.
+Real software development, jobs and when you write code, you will hand it off to a colleague and say hey please give me comments Oh, by the way, happy 2220 2202 22 to 22 pm.
+Sorry, but.
+Your Community communicating to your code reviewers right because you're going to try to make sure they're going to try to make sure the code does what they you and they think it does and you're communicating to your future self.
+And this is again do your future self a favor right you're going to be staring at the code that you write multiple days later.
+Hopefully, with some sleep and and you're going to want to be like oh man, I am so glad I added that extra set of tests as opposed to, who was the idiot who wrote this code great trust me every professional software developer says that often and it's always about themselves.
+There are many ways that have been developed to think about communication right tests are one as we've said naming naming is actually really important.
+Comments commit messages in your get repository code review the the design patterns that you yourself choose to use so let's look at some of these.
+foo.
+foo.
+There are so many foods in so much code and so many bars and slightly fewer basil.
+i'm just gonna trust that's on an emergency slightly fewer basses an awful lot of eyes and jays but that's Okay, but don't use foo no one knows what phil means, because who can mean everything every time you write foo it's a wasted opportunity to express your intent.
+You don't know what the thing should be called you cannot know what it is, if you do not know what it is, you cannot sit down and write the code, there are better names than food.
+So start with your meaning and your intent and now all of this is secondary to well second interfaces with.
+on any project there will probably be style guidelines right if you start working on someone else's Code, the first rule is you do what their style guidelines, say, because then your code fits in with the rest.
+But use words with very precise meanings like data info perform that that's that's like vague you don't do that right prefer fewer words we like things that we can absorb easily in small chunks.
+avoid abbreviations, if your code says like this file copy know you could have added in Oh, and then I could pronounce it it's words, instead of compete.
+Yes, i'm talking to them copy copy.
+Use code review right if your reviewer one nice thing about having another human look at your code is when they're like I couldn't figure out what the heck this thing was doing you're like oh I better name that well, you can even try reading the code out loud copy.
+And then actually take the opportunity to rename fix so.
+Vague abbreviations unnecessary abbreviations, these are just they just add clutter.
+Sometimes in computing we have some habits of these things for historical reasons right there have been languages in which identifiers could only be eight characters or.
+All sorts of things like that, and so often, you will see in many systems, these like attempts to adhere to some of these conventions, but it's 2022 we don't have to do that anymore, so we shouldn't.
+single letters are unsearchable right think about how, if you are looking through your own code or someone else's using your code is a library if they want to find all instances of poo mm hmm all right they're never gonna find it because they're 8 million What was it.
+1,000,937 zero 25 available code results results for foo right you're not helping and but if they're looking for file copy, there will be a million results.
+The exceptions are the places where some of these conventions have become so standardized everybody knows what you mean.
+If you say for INT I equals zero I less than 10 I plus plus everybody says yep that's a loop index i've seen that pattern, that is, like that is the one true way to do an index for a loop that's fine.
+Following the existing style of your system is also very reasonable on unix systems when we do proxy lab in this class, you will see things, called file descriptors representing open files or sockets or things like that every unix function refers to them as fts.
+Because that's the Convention and everybody knows that FDA is a file descriptor, so there are some of these things it's totally fine to go with the existing style, but when you have cash colon her cash see and then you have cash line L and block B.
+We probably prefer that that be a little bit more spelled out so they aren't just the single letter things.
+there's religion here it's okay so good naming limits individual name length write a name like copy this file onto the hard drive, please.
+is just wasting your readers time and a bad name like ctf ot hd is confusing and reduces the need for specialized vocabulary so exam rough guidelines.
+Hand wave hand wave right we're talking about communicating to humans here, there is no absolute right or wrong there is general trends and preferences for what our brains are good with.
+Which of these things do you prefer.
+Right, some of these games kind of Nice right you're like evicted data executive bites evicted foo right cash so think about.
+Right, you can you can name in any of these ways, but don't do that first one.
+Generally, again, there are it's much better to use very descriptive clear names right and part of that is thinking oh what.
+Now, what is it what is this variable actually going to be right it's he's holding a.
+a pointer to the cache line Okay, maybe i'll call it cache line pointer or i'll just call it cache line or things like that right it actually requires you to think a lot to name well.
+There are exceptions to this like meaningless stuff every swap function ever written swaps A and B usually and it probably uses a temporary variable called tmp.
+Because that's just what we do.
+When it's three lines it's totally fine to use very short variables, because you can remember right remember you've got this seven slot little tiny cache memory.
+You can completely remember the binding of A and B to the first and second parameters and read this instantly but as soon as this function gets this long you start to forget it, it blows out your cash.
+Right be specific, if you were writing an employee database it's a part they're an employee they're not a person right what is size in this binary tree.
+What is the size of the tree, is that the number of elements entry like number number elements num is a comment when is it the height of the tree.
+Is it the size of the individual elements that can be stored in the tree, I have no idea because they didn't spell it out.
+Right now, my children sub tree nodes key length whatever you want to call it high be descriptive be very clear, because then someone you reading it a week later, is like oh yeah that's the height of the tree.
+Not only should you be correct about your use of the terminology in a domain when you're right when you're writing a cash simulator.
+You will be using terminology used to describe caches and you should make sure you are using them correctly one you'll get better style points to.
+It helps you remember what those things are right from a pedagogical perspective it's way better for this class if you use the right terms in your cash simulator.
+But three it makes it much more clear to someone who already knows these concepts there's like oh yeah that's a that's a food that's a whatever see that go through.
+So consider things like line cache line element right, how can these how could you use these terms how could you use them better block offset cash block cache line set.
+and make sure when you use those words you're using them appropriately, but when you have the opportunity to use them in your code do use them, it would be much better to call it, you know pointer geocache line or cache line and then to call it X.
+you're talking to humans right when you say and when you're using descriptive words if you have a pointer to the start of your array.
+You should be consistent and you have a pointer to the end of your array right, but if you say Oh, this is the first in my array, and this is the end it right did that hurt your brain a little bit right first end no no first last start and right first second.
+blah blah blah blah so think about your think about your terminology from a communication perspective, not just from a like oh i've got to get this stuff done perspective.
+And then we get to comments Oh, by the way, i'm Professor weinberg ads on chat that the when I said w all does not actually technically mean all the warnings, there are extra warnings, you can enable.
+It means all of the warnings that should be on by default, but aren't for historical reasons.
+Which is pretty true when compiler writers add new warnings to a language they may not make them default because they don't want to break old code.
+Even though they really think you ought to use this Warner and so w all brings in those warnings, even though they're not going to be there with the defaults for reasons there are actually even more warnings, you can get if you ever really want to see something silly tried dash w pedantic.
+Then it starts like nitpicking you about everything in your code okay.
+Finally, right everything we've talked about is communication using your code and honestly that is the most important part, having a clear design with well chosen names and a good structure.
+is the single most important part or the most important three parts of having your code be communicated to other people comments are the last part.
+And in many ways, they are the least because it doesn't matter how well commented your spaghetti is it's still speaking right but you're well structured code doesn't need as many comments, but there are places that you want comments.
+So there are some things you shouldn't do don't say what don't like initialize I I equals zero really thanks right when possible don't explain awkward logic.
+And don't add too many comments right, so if someone has written this line of code right star void star star star star star BP plus ISA is right yeah.
+Like no amount of commenting is going to make that fun to read, if someone wants to read it they're going to literally sit there for a few minutes figuring this out.
+But what if you just wrote pgp proof next equals BP proof, because you pick nice structure to map this to and had done a good job of naming things right those two lines of code are identical.
+They update the program state and the same way with the right structure to find one of them, you communicated your intent by good naming the other you heard somebody deeply.
+But you should answer things like, why does this code exist when should I use this code when shouldn't I use this code, what are the alternatives.
+Why, why is Max address like 17 right that's not obvious, you should have a comment, explaining that.
+Oh, the addresses are 16 bits which is 16 plus one X characters okay now I get it right that's what 17 I was like huh okay it's prime but what else and like.
+If you wrote this power of to code don't read it, it does the right thing, but it does compute power of two by just doubling the number over and over and over.
+Like hmm.
+There are power functions in the standard library, you could do it with a you know one left shifted a certain number of times.
+Someone wrote this code and they must have had a use in mind, but goodness knows what the heck it was unless they've left a comment right use this when adding hundred and 28 bit numbers because the compiler messes up operation foo right oh Okay, I get it.
+Another thing to document our algorithms if there is a tricky algorithm.
+Right and you've chosen that algorithm because it was an important algorithm it's very useful Doug document that.
+write this code implant i'm going to pick on our previous algorithms bus this code implements the 40 fulkerson algorithm for finding maximum flow.
+And it is a translation of the code in the book The Carnegie mellon uses for for 51 and such and such you can find a pointer to the algorithm here right that's a lovely comments for a complicated algorithm because it let someone go and figure out what the heck is going on.
+One thing that can be very helpful, from both a communication, but also a blank page problem is to code by commenting.
+Right, you can code by testing as we've talked about, but you can also code by commenting I do this, a lot when I write a function, I give the function name i'm like okay.
+Add element to cash and I go and I think i'm like okay well, what do I have to do in order to add the elements of the cash.
+And that kind of seems daunting, and so I start writing comments to myself.
+Right here's a quick sort of example okay i'm going to initialize whatever my locals are oh yeah Quick Start I need to pick a pivot value right.
+And then I reorder the entire array around the pivot and then I go recursive on the two sub arrays just writing those four comments.
+makes it so much easier for you to write the rest of the code, because then you're like oh yeah I don't have to actually implement Quick Start all I have to do is pick a pivot value I you know i'm feeling strong I can pick a pivot.
+And then you kind of you know it helps you break the work down, and you can see it, and then you can tackle it, so it is, it is a motivating factor it's communicating factor.
+And then you can leave those comments in and then adjust them right initialized locals is not a useful comment to leave in after you've written your code, but pick a pivot value is.
+And reorder the array around the pivot right like okay that's a that's a reasonable description of an algorithmic step in your process you're performing.
+So.
+That brings us to this idea of kind of starting some of your coding by commenting right the short comments of what it will do write the code revise those comments, so that now they're good communicators for you, for future you and then maintain the Code and the revised estimates.
+whoo.
+commit messages are also really useful.
+So.
+One thing in in debugging in particular is that bugs are most likely but it's not 100% but are most likely to show up in freshly written code.
+Your get commit history helps you remember what code was written and when and why so your get committed messages are communicating to future you about what the heck you were thinking at 3am Thursday, when you were working on the assignment.
+And they also help obviously right commit frequently because that helps guard against catastrophe.
+When you accidentally cat and redirects to your file you rm dash rf your file system you whatever it is you've done right, it is really easy to accidentally blast away your code close to the deadline, because great sadness and get can save your bacon.
+Persons command line arguments fixing unique you know, in general, the length of the commit message should probably be proportional to the.
+amount of work and complicated functionality, but really just think about what you in the future would want to remember wrote the new you know.
+For me, when I implemented cash lab, for example, the very first thing I did was I implemented main and I had it print Hello world.
+I did not commit that to my repository I then implemented the argument person.
+I looked at the little output and I was like Okay, I know how to do that with our with our inverse so I wrote the argument person.
+And at the very end of it, I had it print out the values they had parsed I committed that I was like implement main with argument person.
+And that was a great synchronization points I saved it with a little pretty obvious commit right, and then you go on and go, so the and so forth, and so forth.
+Using branches can be very helpful when you are not exactly certain about the path that you're going to take now you know what because it's easy to throw a branch away.
+You don't need to become good experts some of this can be painful everybody needs to get expert on call.
+But using a branch can be a way to save some code experiment with it come back to it later.
+So, in summary, all code has defects.
+And there are people out there, whose jobs, it is to calculate defect rates per line of code written right, it is so predictable that humans introduce bugs in their code.
+That we can actually just guess, we can be like oh you've written 1000 lines of code and you're using this particular development process, therefore, there are 10 bugs in your in your code plus or minus a few.
+And let's go find them right NASA does that a lot so when in doubt when you really need to be systematic about finding them, including writing down your observations what the code is and being careful to describe what you believe the code should do.
+and
+Overall, the programs that you are starting to write in this class are more complicated than a human can hold in their head at one time.
+That is partly true for cash lab right, especially because when you're optimizing your matrix.
+transformation you're going to have tried like 10 different things you're like well I tried cash blocking I tried this I tried that.
+And this one got this result right, you need to be structured about that you need to write down your your progress in your attendance and things like that.
+And you need to write your code to make it more manageable and in Malik lab the code itself, you can write it blows out your cash a little bit.
+And then distributed systems for 40 write the code really blows out your cash it's by design we do it on purpose.
+And programming is not a solitary profession, even when you are just alone programming, because you are always communicating to your future self if not your teammates your bosses your colleagues your employees your people.
+So be understandable in your communication, and you do that through the structure of your code you do that through the naming of your variables you do that through your tests you do that through your comments.
+and your get committed messages and all of these things will help you appreciate former you instead of wanting to say bad things to former you yes How much are we finally see interface when we care about what the compiler does how it lays up memory caching.
+i'm not sure how to parse the question Can you clarify, so we know how you're gonna draw.
+Like array and we can use them.
+By being allowed.
+So.
+Things that you do for optimizations probably aren't violating it as long as you're not accessing offsets explicitly using them, but I would say in general.
+You do not want to optimize in ways that violates the contracts between you and the compiler.
+There are practices, you can use to tell the compiler to force particular offsets or alignments and things like that.
+It is far better to find ways to work with the compiler instead of working around the compiler or you know, hoping that the compiler behaves the way that you think it will.
+If all else fails right, you can always resort to manually doing some things in C, you can write in line assembly.
+You can allocate a blank chunk of memory that is a particular size and you can manage it like you want, with some in line assembly, you could do that.
+I don't recommend it for all, but the most critical situations, but you can do that, so, in general, you should never make assumptions that are unsafe because.
+Correct slow code beats incorrect fast code every day because the crash slows you down all right, thank you all have a wonderful and expect that you will be coming here for Class on Thursday, and it may be me, and it may be, Professor weinberg on the screen be well have an.
